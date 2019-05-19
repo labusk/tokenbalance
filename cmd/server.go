@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	tb "github.com/hunterlong/tokenbalance"
+	tb "github.com/labusk/tokenbalance"
 	"log"
 	"net/http"
 	"time"
