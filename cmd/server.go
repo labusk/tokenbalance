@@ -4,11 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	tb "github.com/labusk/tokenbalance"
 	"log"
 	"net/http"
 	"time"
+
+	"bitbucket.org/voranskripto/nameconverters/hotwalletconverter"
+	"bitbucket.org/voranskripto/nameconverters/tickerconverter"
+
+	"github.com/gorilla/mux"
+	tb "github.com/labusk/tokenbalance"
 )
 
 func router() *mux.Router {
@@ -16,6 +20,7 @@ func router() *mux.Router {
 	r.HandleFunc("/balance/{contract}/{wallet}", getBalanceHandler).Methods("GET")
 	r.HandleFunc("/token/{contract}/{wallet}", getTokenHandler).Methods("GET")
 	r.HandleFunc("/health", getHealthHandler)
+	r.HandleFunc("/labustoken/{contract}/{wallet}", getLabusTokenHandler)
 	return r
 }
 
@@ -85,4 +90,43 @@ func getBalanceHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(query.BalanceString()))
 	}
+}
+
+func convertVars(symbol, exchange string) (contract, wallet string, err error) {
+	contract, err = tickerconverter.ConvertSymbol(symbol)
+	if err != nil {
+		return "", "", err
+	}
+	wallet, err = hotwalletconverter.ConvertExchangeName(exchange)
+	if err != nil {
+		return "", "", err
+	}
+	return
+}
+
+func getLabusTokenHandler(w http.ResponseWriter, r *http.Request) {
+	symbol, exchange := collectVars(r)
+	contract, wallet, err := convertVars(symbol, exchange)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err != nil {
+		m := errorResponse{
+			Error:   true,
+			Message: err.Error(),
+		}
+		json.NewEncoder(w).Encode(m)
+		return
+	}
+	query, err := tb.New(contract, wallet)
+	if err != nil {
+		m := errorResponse{
+			Error:   true,
+			Message: err.Error(),
+		}
+		json.NewEncoder(w).Encode(m)
+		return
+	}
+	json.NewEncoder(w).Encode(query)
+
+	log.Println("Fetching /balance for Wallet:", wallet, "at Contract:", contract)
 }
