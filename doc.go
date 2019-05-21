@@ -28,5 +28,5 @@
 // Rinkeby Testnet API Endpoint:
 // https://rinkeby.tokenbalance.com
 //
-// More info on: https://github.com/hunterlong/tokenbalance
+// More info on: https://github.com/labusk/tokenbalance
 package tokenbalance

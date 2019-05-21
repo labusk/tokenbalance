@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	tb "github.com/hunterlong/tokenbalance"
+	tb "github.com/labusk/tokenbalance"
 	"github.com/mkideal/cli"
 	"github.com/stretchr/testify/assert"
 	"net/http"
