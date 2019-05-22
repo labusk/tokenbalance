@@ -108,6 +108,7 @@ func getLabusTokenHandler(w http.ResponseWriter, r *http.Request) {
 	symbol, exchange := collectVars(r)
 	contract, wallet, err := convertVars(symbol, exchange)
 	w.Header().Set("Content-Type", "application/json")
+	enableCORS(&w)
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
 		m := errorResponse{
@@ -129,4 +130,10 @@ func getLabusTokenHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(query)
 
 	log.Println("Fetching /balance for Wallet:", wallet, "at Contract:", contract)
+}
+
+func enableCORS(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "*")
+	(*w).Header().Set("Access-Control-Allow-Headers", "*")
 }
