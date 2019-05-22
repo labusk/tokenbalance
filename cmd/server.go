@@ -105,7 +105,6 @@ func convertVars(symbol, exchange string) (contract, wallet string, err error) {
 }
 
 func getLabusTokenHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	enableCORS(&w)
 	err := r.ParseForm()
@@ -129,6 +128,7 @@ func getLabusTokenHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(m)
 		return
 	}
+	log.Println("Fetching /balance for Wallet:", wallet, "at Contract:", contract)
 	query, err := tb.New(contract, wallet)
 	if err != nil {
 		m := errorResponse{
@@ -139,8 +139,6 @@ func getLabusTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.NewEncoder(w).Encode(query)
-
-	log.Println("Fetching /balance for Wallet:", wallet, "at Contract:", contract)
 }
 
 func enableCORS(w *http.ResponseWriter) {
