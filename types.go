@@ -2,8 +2,9 @@ package tokenbalance
 
 import (
 	"context"
-	"github.com/ethereum/go-ethereum/common"
 	"math/big"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 type Config struct {
@@ -12,15 +13,16 @@ type Config struct {
 }
 
 type TokenBalance struct {
-	Contract common.Address
-	Wallet   common.Address
-	Name     string
-	Symbol   string
-	Balance  *big.Int
-	ETH      *big.Int
-	Decimals int64
-	Block    int64
-	ctx      context.Context
+	Contract     common.Address
+	Wallet       common.Address
+	Name         string
+	Symbol       string
+	Balance      *big.Int
+	ETH          *big.Int
+	Decimals     int64
+	Block        int64
+	LabusBalance *big.Int
+	ctx          context.Context
 }
 
 type tokenBalanceJson struct {

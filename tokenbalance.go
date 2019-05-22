@@ -6,10 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	logFmt "log"
 	"math/big"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 var (
@@ -24,11 +25,12 @@ func New(contract, wallet string) (*TokenBalance, error) {
 		return nil, errors.New("geth server connection has not been created")
 	}
 	tb := &TokenBalance{
-		Contract: common.HexToAddress(contract),
-		Wallet:   common.HexToAddress(wallet),
-		Decimals: 0,
-		Balance:  big.NewInt(0),
-		ctx:      context.TODO(),
+		Contract:     common.HexToAddress(contract),
+		Wallet:       common.HexToAddress(wallet),
+		Decimals:     0,
+		Balance:      big.NewInt(0),
+		LabusBalance: big.NewInt(0),
+		ctx:          context.TODO(),
 	}
 	err = tb.query()
 	return tb, err
@@ -118,6 +120,8 @@ func (tb *TokenBalance) query() error {
 		log(fmt.Sprintf("Failed to retrieve token name from contract: %v | %v\n", tb.Contract.String(), err), false)
 		tb.Name = "MISSING"
 	}
+	bigDecimal := big.NewInt(tb.Decimals)
+	tb.LabusBalance.Div(tb.Balance, bigDecimal.Exp(big.NewInt(10), bigDecimal, nil))
 
 	return err
 }
