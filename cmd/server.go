@@ -20,7 +20,7 @@ func router() *mux.Router {
 	r.HandleFunc("/balance/{contract}/{wallet}", getBalanceHandler).Methods("GET")
 	r.HandleFunc("/token/{contract}/{wallet}", getTokenHandler).Methods("GET")
 	r.HandleFunc("/health", getHealthHandler)
-	r.HandleFunc("/labustoken/{contract}/{wallet}", getLabusTokenHandler)
+	r.HandleFunc("/labustoken", getLabusTokenHandler)
 	return r
 }
 
@@ -105,7 +105,18 @@ func convertVars(symbol, exchange string) (contract, wallet string, err error) {
 }
 
 func getLabusTokenHandler(w http.ResponseWriter, r *http.Request) {
-	symbol, exchange := collectVars(r)
+	err := r.ParseForm()
+	if err != nil {
+		m := errorResponse{
+			Error:   true,
+			Message: err.Error(),
+		}
+		json.NewEncoder(w).Encode(m)
+		return
+	}
+	symbol := r.Form.Get("coin")
+	exchange := r.Form.Get("exchange")
+	log.Println(symbol, exchange)
 	contract, wallet, err := convertVars(symbol, exchange)
 	w.Header().Set("Content-Type", "application/json")
 	enableCORS(&w)
@@ -134,6 +145,6 @@ func getLabusTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 func enableCORS(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Methods", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "GET")
 	(*w).Header().Set("Access-Control-Allow-Headers", "*")
 }
